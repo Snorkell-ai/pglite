@@ -10,6 +10,10 @@ const PGSHARE_URL = new URL("../release/share.data", import.meta.url);
 export class IdbFs extends FilesystemBase {
   initModule?: any;
 
+  /**
+   * Asynchronously initializes the method.
+   * @throws {Error} Throws an error if the initialization fails.
+   */
   async init() {
     const dbExists = (await window.indexedDB.databases())
       .map((db) => db.name)
@@ -19,6 +23,12 @@ export class IdbFs extends FilesystemBase {
     }
   }
 
+  /**
+   * Asynchronously sets options for Emscripten Postgres.
+   * @param opts - Partial<EmPostgres> - The options to be set.
+   * @throws - Throws an error if there is an issue with setting the options.
+   * @returns - Promise<Partial<EmPostgres>> - A promise that resolves with the set options.
+   */
   async emscriptenOpts(opts: Partial<EmPostgres>) {
     const options: Partial<EmPostgres> = {
       ...opts,
@@ -66,6 +76,12 @@ export class IdbFs extends FilesystemBase {
     return options;
   }
 
+  /**
+   * Performs initial synchronization with the file system.
+   * @param fs The file system to synchronize with.
+   * @throws {any} Throws an error if synchronization fails.
+   * @returns {Promise<void>} A promise that resolves when synchronization is successful.
+   */
   initialSyncFs(fs: FS) {
     if (this.initModule) {
       return this.syncToFs(fs);
@@ -82,6 +98,12 @@ export class IdbFs extends FilesystemBase {
     }
   }
 
+  /**
+   * Synchronize to file system
+   * @param fs - The file system to synchronize with
+   * @throws {any} - Throws an error if synchronization fails
+   * @returns {Promise<void>} - A promise that resolves when synchronization is successful
+   */
   syncToFs(fs: FS) {
     return new Promise<void>((resolve, reject) => {
       fs.syncfs((err: any) => {

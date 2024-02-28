@@ -12,11 +12,17 @@ const PGSHARE_URL = new URL("../release/share.data", import.meta.url);
 export class NodeFS extends FilesystemBase {
   protected rootDir: string;
 
+  
   constructor(dataDir: string) {
     super(dataDir);
     this.rootDir = path.resolve(dataDir);
   }
 
+  /**
+   * Asynchronously initializes the data directory.
+   * @throws {Error} Throws an error if no data directory is specified.
+   * @throws {Error} Throws an error if the PG_VERSION file already exists in the data directory.
+   */
   async init() {
     if (!this.dataDir) {
       throw new Error("No datadir specified");
@@ -28,6 +34,13 @@ export class NodeFS extends FilesystemBase {
     await initDb(this.dataDir);
   }
 
+  /**
+   * Asynchronously sets Emscripten options for PostgreSQL.
+   * 
+   * @param opts - Partial<EmPostgres> - The options to be set.
+   * @returns Promise<Partial<EmPostgres>> - The modified Emscripten options.
+   * @throws Error - If there is an error in setting Emscripten options.
+   */
   async emscriptenOpts(opts: Partial<EmPostgres>) {
     const options: Partial<EmPostgres> = {
       ...opts,
