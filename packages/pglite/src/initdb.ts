@@ -39,6 +39,12 @@ export const FILES = [
   "pg_hba.conf",
 ];
 
+/**
+ * Initializes the database with the provided data directory.
+ * 
+ * @param dataDir Optional data directory path.
+ * @throws Error if there is an issue initializing the database.
+ */
 export async function initDb(dataDir?: string) {
   var emscriptenOpts: Partial<EmPostgres> = {
     preRun: [

@@ -41,6 +41,7 @@ export class PGlite {
   #queryMutex = new Mutex();
   #fsSyncMutex = new Mutex();
 
+  
   constructor(dataDir?: string) {
     if (dataDir?.startsWith("file://")) {
       this.dataDir = dataDir.slice(7);
@@ -140,6 +141,11 @@ export class PGlite {
     return this.#closed;
   }
 
+  /**
+   * Asynchronously closes the method.
+   * 
+   * @throws {Error} If an error occurs while dispatching the event.
+   */
   async close() {
     const event = new CustomEvent("query", {
       detail: {
@@ -151,6 +157,12 @@ export class PGlite {
     this.#closed = true;
   }
 
+  /**
+   * Asynchronously executes a query.
+   * @param query The query to be executed.
+   * @throws {Error} Throws an error if the Postgreslite is closed.
+   * @returns A promise that resolves with the result of the query execution.
+   */
   async query(query: String) {
     /**
      * TODO:
@@ -165,6 +177,11 @@ export class PGlite {
     return new Promise(async (resolve, reject) => {
       await this.#queryMutex.runExclusive(async () => {
         this.#awaitingResult = true;
+        /**
+         * Asynchronously handles waiting for a result.
+         * 
+         * @throws {Error} If there is a result error.
+         */
         const handleWaiting = async () => {
           await this.#syncToFs();
           this.#eventTarget.removeEventListener("result", handleResult);
@@ -177,6 +194,12 @@ export class PGlite {
           this.#awaitingResult = false;
         };
 
+        /**
+         * Handles the result of an asynchronous operation.
+         * 
+         * @param e The event object containing the result detail.
+         * @throws {Error} If there is an error while handling the result.
+         */
         const handleResult = async (e: any) => {
           await this.#syncToFs();
           this.#eventTarget.removeEventListener("waiting", handleWaiting);
